@@ -173,7 +173,7 @@ function openPanelWithResponseData(response) {
         <p><strong>Email:</strong> ${response.email.substring(0, 3)}***${response.email.substring(response.email.length - 10)}</p>
         <p><strong>Support Community:</strong> ${response.support_community}</p>
         <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
-        <p><strong>Phone number provided:</strong> ${response.phone_number ? 'true' : 'false'}</p>
+        <p><strong>Phone number provided:</strong> ${response.phone_number ? '✅' : '❌'}</p>
         <p><strong>Availability:</strong> ${response.availability}</p>
         <p><strong>Comments:</strong> ${response.comments}</p>
         <button onclick="closePanel()">Close</button>
