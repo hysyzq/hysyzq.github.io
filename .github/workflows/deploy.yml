@@ -3,7 +3,7 @@ name: Deploy back-to-kps to GitHub Pages
 on:
   push:
     branches:
-      - main  # Adjust if you use a different branch for deployment
+      - dev
 
 jobs:
   build-deploy:
