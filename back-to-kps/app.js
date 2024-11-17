@@ -146,7 +146,6 @@ async function fetchFormResponseDataFromGoogleSheets() {
     // Assuming the first row is headers, start from the second row
     for (let i = 1; i < rows.length; i++) {
         const [timestamp, preferred_name, email, street_number, street_name, support_community, main_concerns, phone_number, availability, comments] = rows[i];
-        console.log(response);
         responses.push({
             timestamp: timestamp,
             preferred_name: preferred_name,
