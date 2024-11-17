@@ -22,7 +22,7 @@ async function initMap() {
                 const marker = new google.maps.marker.AdvancedMarkerElement({
                     position: { lat: parseFloat(matchingHouse.latitude), lng: parseFloat(matchingHouse.longitude) },
                     map: map,
-                    title: "House " + matchingHouse.id,
+                    title: `${matchingHouse.street_number} ${matchingHouse.street_name}`,
                     content: createMarkerContent(response)
                 });
 
@@ -37,7 +37,7 @@ async function initMap() {
                 const marker = new google.maps.marker.AdvancedMarkerElement({
                     position: { lat: parseFloat(house.latitude), lng: parseFloat(house.longitude) },
                     map: map,
-                    title: "House " + house.id,
+                    title: `${house.street_number} ${house.street_name}`,
                     content: createMarkerContent(house)
                 });
 
