@@ -2,21 +2,55 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden; /* Prevent scrolling */
+}
+
+header {
+    background: #ff0048; /* Blue header */
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.header-text {
+    margin: 1px;
+}
+
+main {
+    display: flex;
+    height: calc(100vh - 30px); /* Full height minus header */
 }
 
 #map {
-    height: 500px;
+    width: 60%; /* Explicitly set width to 60% */
+    height: 100%; /* Full height of the container */
+    box-sizing: border-box; /* Ensure padding/border doesn\u2019t add extra width */
 }
 
 .panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    max-height: 50%;
+    width: 40%; /* Explicitly set width to 40% */
+    height: 100%; /* Full height of the container */
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     overflow-y: auto;
-    background: #fff;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-    padding: 15px;
+    box-sizing: border-box; /* Ensure proper sizing */
+    border: 1px rgba(0, 0, 0, 0.2);
+}
+
+@media screen and (max-width: 768px) {
+    main {
+        flex-direction: column; /* Stack vertically on small screens */
+    }
+
+    #map,
+    .panel {
+        width: 100%;
+        height: 50%; /* Each takes 50% height when stacked */
+    }
+
+    .panel {
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    }
 }

@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPS - Community Form Collection</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss&libraries=marker"></script>
     <link rel="stylesheet" href="style.css">
-    <title>Community Form Collection</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="app.js" defer></script>
 </head>
-<body>
-    <div id="map" style="height: 500px;"></div>
-    <div id="formPanel" class="panel">
-        <form>
-            <label for="checkbox1">Checkbox 1</label>
-            <input type="checkbox" id="checkbox1">
-            
-            <label for="input1">Input 1</label>
-            <input type="text" id="input1">
-
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="app.js"></script>
+<body onload="initMap()">
+    <header>
+        <h4 class="header-text">KPS - Community Form Collection</h4>
+    </header>
+    <main>
+        <div id="map"></div>
+        <div class="panel" id="formPanel">
+            <h3>House Information</h3>
+        </div>
+    </main>
 </body>
 </html>
