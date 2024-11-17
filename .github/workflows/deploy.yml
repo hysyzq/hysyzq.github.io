@@ -3,37 +3,26 @@ name: Deploy back-to-kps to GitHub Pages
 on:
   push:
     branches:
-      - dev  # Only deploy when there's a push to the dev branch
+      - main
+      - dev
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 4: Echo environment variables (for debugging purposes)
-      # WARNING: This will expose your keys in the workflow logs. Do not use this in production.
-      - name: Echo environment variables
-        env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-          GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
-        run: |
-          echo "GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}"
-          echo "GOOGLE_SHEET_API_KEY=${GOOGLE_SHEET_API_KEY}"
-
-      # Step 5: Set environment variables and generate env.js
       - name: Set environment variables
         env:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
           GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
         run: |
+          mkdir -p back-to-kps
           echo "window.GOOGLE_MAPS_API_KEY='${GOOGLE_MAPS_API_KEY}';" > back-to-kps/env.js
           echo "window.GOOGLE_SHEET_API_KEY='${GOOGLE_SHEET_API_KEY}';" >> back-to-kps/env.js
 
-      # Step 6: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
