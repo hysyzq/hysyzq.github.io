@@ -27,7 +27,7 @@ async function initMap() {
                 });
 
                 marker.addListener('click', function() {
-                    openPanelWithHouseData(response);
+                    openPanelWithResponseData(response);
                 });
             }
         });
@@ -42,7 +42,7 @@ async function initMap() {
                 });
 
                 marker.addListener('click', function() {
-                    openPanelWithHouseData(house);
+                    openGoogleForm(house);
                 });
             }
         });
@@ -164,20 +164,29 @@ async function fetchFormResponseDataFromGoogleSheets() {
     return responses;
 }
 
-function openPanelWithHouseData(house) {
-    // Displaying form with the details of the clicked house
+function openPanelWithResponseData(response) {
+    // Displaying form with the details of the clicked response
     const formPanel = document.getElementById('formPanel');
     formPanel.innerHTML = `
-        <h3>Address: ${house.street_number}  ${house.street_name}</h3>
-        <form>
-            <label for="checkbox1">Checkbox 1</label>
-            <input type="checkbox" id="checkbox1">
-            <br>
-            <label for="input1">Input 1</label>
-            <input type="text" id="input1">
-            <br><br>
-            <button type="submit">Submit</button>
-        </form>
+        <h3>Address: ${response.street_number} ${response.street_name}</h3>
+        <p><strong>Preferred Name:</strong> ${response.preferred_name}</p>
+        <p><strong>Email:</strong> ${response.email.substring(0, 3)}***${response.email.substring(response.email.length - 10)}</p>
+        <p><strong>Support Community:</strong> ${response.support_community}</p>
+        <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
+        <p><strong>Phone number provided:</strong> ${response.phone_number ? 'true' : 'false'}</p>
+        <p><strong>Availability:</strong> ${response.availability}</p>
+        <p><strong>Comments:</strong> ${response.comments}</p>
+        <button onclick="closePanel()">Close</button>
+    `;
+}
+
+function openGoogleForm() {
+    // Display Google Form link in the panel
+    const formPanel = document.getElementById('formPanel');
+    formPanel.innerHTML = `
+        <h3>Submit Your Information</h3>
+        <p>Please fill out the form to provide more information about your household.</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd9RBuwM5OJFsknA77ag35fo8iFY1HEXMjw78E-9vQeHb4A1g/viewform?usp=sf_link" target="_blank">Open Google Form</a>
         <button onclick="closePanel()">Close</button>
     `;
 }
