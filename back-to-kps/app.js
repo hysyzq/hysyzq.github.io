@@ -18,9 +18,11 @@ async function initMap() {
             );
             
             if (matchingHouse) {
-                matchingHouse.picked = true;
+
+                const adjustedLongitude = parseFloat(matchingHouse.longitude) + (matchingHouse.picked * 0.00002);
+
                 const marker = new google.maps.marker.AdvancedMarkerElement({
-                    position: { lat: parseFloat(matchingHouse.latitude), lng: parseFloat(matchingHouse.longitude) },
+                    position: { lat: parseFloat(matchingHouse.latitude), lng: adjustedLongitude },
                     map: map,
                     title: `${matchingHouse.street_number} ${matchingHouse.street_name}`,
                     content: createMarkerContent(response)
@@ -29,6 +31,7 @@ async function initMap() {
                 marker.addListener('click', function() {
                     openPanelWithResponseData(response);
                 });
+                matchingHouse.picked += 1;
             }
         });
 
@@ -56,26 +59,26 @@ function createMarkerContent(response) {
     let pinColor;
     let borderColor;
     let scale;
-    switch (response.support_community) {
-        case 'Yes, through volunteering.':
+    switch (response.support_level) {
+        case 4:
             pinColor = '#52b788'; // Green
             borderColor = '#081c15';
             scale = 1.0;
             break;
-        case 'Yes, but I only want to participate in the most important meetings.':
+        case 3:
             pinColor = '#00b4d8'; // Blue
             borderColor = '#0077b6';
             scale = 1.0;
             break;
-        case 'No, not at this time.':
-            pinColor = '#495057'; // Grey
-            borderColor = '#343a40';
-            scale = 0.7;
-            break;
-        case 'I am interested, but I need more information.':
+        case 2:
             pinColor = '#e63946'; // Red
             borderColor = '#9d0208';
             scale = 1.0;
+            break;
+        case 1:
+            pinColor = '#495057'; // Grey
+            borderColor = '#343a40';
+            scale = 0.7;
             break;
         default:
             pinColor = '#fefae0'; // Default
@@ -119,7 +122,7 @@ async function fetchHouseDataFromGoogleSheets() {
             longitude: longitude,
             street_number: street_number,
             street_name: street_name,
-            picked: false,
+            picked: 0,
         });
     }
 
@@ -157,18 +160,48 @@ async function fetchFormResponseDataFromGoogleSheets() {
             phone_number: phone_number,
             availability: availability,
             comments: comments,
+            support_level: getSupportLevel(support_community),
         });
     }
 
     return responses;
 }
 
+function getSupportLevel(support_community){
+    switch (support_community) {
+        case 'Yes, through volunteering.':
+            return 4;
+        case 'Yes, but I only want to participate in the most important meetings.':
+            return 3;
+        case 'I am interested, but I need more information.':
+            return 2
+        case 'No, not at this time.':
+            return 1;
+        default:
+            return 0;
+    }
+}
+
 function openPanelWithResponseData(response) {
+    // Masking logic for the preferred name
+    let maskedPreferredName;
+    if (response.preferred_name.includes(" ")) {
+        // Mask everything after the first space
+        maskedPreferredName = response.preferred_name.split(" ")[0] + " ***";
+    } else if (response.preferred_name.length > 3) {
+        // Mask the last two characters if there's no space
+        const visiblePart = response.preferred_name.slice(0, -2);
+        maskedPreferredName = visiblePart + "**";
+    } else {
+        // Show the entire name if it's less than or equal to 3 characters
+        maskedPreferredName = response.preferred_name;
+    }
+
     // Displaying form with the details of the clicked response
     const formPanel = document.getElementById('formPanel');
     formPanel.innerHTML = `
         <h3>Address: ${response.street_number} ${response.street_name}</h3>
-        <p><strong>Preferred Name:</strong> ${response.preferred_name}</p>
+        <p><strong>Preferred Name:</strong> ${maskedPreferredName}</p>
         <p><strong>Email:</strong> ${response.email.substring(0, 3)}***${response.email.substring(response.email.length - 10)}</p>
         <p><strong>Support Community:</strong> ${response.support_community}</p>
         <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
@@ -178,6 +211,7 @@ function openPanelWithResponseData(response) {
         <button onclick="closePanel()">Close</button>
     `;
 }
+
 
 function openGoogleForm() {
     // Display Google Form link in the panel
