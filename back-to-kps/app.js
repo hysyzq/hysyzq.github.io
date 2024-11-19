@@ -132,7 +132,7 @@ async function fetchHouseDataFromGoogleSheets() {
 async function fetchFormResponseDataFromGoogleSheets() {
     const spreadsheetId = '1KKfRYIl4uh7N0HtxBT5EVGDKfZCXLJi81HNPNLkj-LY';
     const apiKey = 'AIzaSyBS-QIHhKKCmhg8Lz54cwxNeWW-DXHYOzM'; 
-    const range = 'FormResponse!A:J';
+    const range = 'MaskedData!A:K';
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
     
@@ -148,7 +148,7 @@ async function fetchFormResponseDataFromGoogleSheets() {
     
     // Assuming the first row is headers, start from the second row
     for (let i = 1; i < rows.length; i++) {
-        const [timestamp, preferred_name, email, street_number, street_name, support_community, main_concerns, phone_number, availability, comments] = rows[i];
+        const [timestamp, preferred_name, email, street_number, street_name, support_community, main_concerns,petition, phone_number, availability, comments] = rows[i];
         responses.push({
             timestamp: timestamp,
             preferred_name: preferred_name,
@@ -157,6 +157,7 @@ async function fetchFormResponseDataFromGoogleSheets() {
             street_name: street_name,
             support_community: support_community,
             main_concerns: main_concerns,
+            petition: petition,
             phone_number: phone_number,
             availability: availability,
             comments: comments,
@@ -183,29 +184,16 @@ function getSupportLevel(support_community){
 }
 
 function openPanelWithResponseData(response) {
-    // Masking logic for the preferred name
-    let maskedPreferredName;
-    if (response.preferred_name.includes(" ")) {
-        // Mask everything after the first space
-        maskedPreferredName = response.preferred_name.split(" ")[0] + " ***";
-    } else if (response.preferred_name.length > 3) {
-        // Mask the last two characters if there's no space
-        const visiblePart = response.preferred_name.slice(0, -2);
-        maskedPreferredName = visiblePart + "**";
-    } else {
-        // Show the entire name if it's less than or equal to 3 characters
-        maskedPreferredName = response.preferred_name;
-    }
-
     // Displaying form with the details of the clicked response
     const formPanel = document.getElementById('formPanel');
     formPanel.innerHTML = `
         <h3>Address: ${response.street_number} ${response.street_name}</h3>
-        <p><strong>Preferred Name:</strong> ${maskedPreferredName}</p>
-        <p><strong>Email:</strong> ${response.email.substring(0, 3)}***${response.email.substring(response.email.length - 10)}</p>
+        <p><strong>Preferred Name:</strong> ${response.preferred_name}</p>
+        <p><strong>Email:</strong> ${response.email}</p>
         <p><strong>Support Community:</strong> ${response.support_community}</p>
         <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
-        <p><strong>Phone number provided:</strong> ${response.phone_number ? '✅' : '❌'}</p>
+        <p><strong>Petition signed:</strong> ${response.petition}</p>
+        <p><strong>Phone number:</strong> ${response.phone_number}</p>
         <p><strong>Availability:</strong> ${response.availability ? response.availability : 'N/A'}</p>
         <p><strong>Comments:</strong> ${response.comments ? response.comments : 'N/A'}</p>
         <button onclick="closePanel()">Close</button>
