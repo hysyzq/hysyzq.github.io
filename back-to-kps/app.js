@@ -193,7 +193,7 @@ function openPanelWithResponseData(response) {
         <p><strong>Support Community:</strong> ${response.support_community}</p>
         <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
         <p><strong>Petition signed:</strong> ${response.petition}</p>
-        <p><strong>Phone number:</strong> ${response.phone_number}</p>
+        <p><strong>Phone number:</strong> ${response.phone_number ? response.phone_number : 'N/A'}</p>
         <p><strong>Availability:</strong> ${response.availability ? response.availability : 'N/A'}</p>
         <p><strong>Comments:</strong> ${response.comments ? response.comments : 'N/A'}</p>
         <button onclick="closePanel()">Close</button>
