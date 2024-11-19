@@ -85,11 +85,12 @@ function createMarkerContent(response) {
             borderColor = '#dda15e';
             scale = 0.7;
     }
+    const glyph = response.preferred_name?.charAt(0).toUpperCase() || "";
     const pinBackground = new google.maps.marker.PinElement({
         scale: scale,
         background: pinColor,
         borderColor: borderColor,
-        //glyph: "G",
+        glyph: glyph,
         glyphColor: "white",
       });
     return pinBackground.element;
@@ -98,7 +99,7 @@ function createMarkerContent(response) {
 
 async function fetchHouseDataFromGoogleSheets() {
     const spreadsheetId = '1KKfRYIl4uh7N0HtxBT5EVGDKfZCXLJi81HNPNLkj-LY';
-    const apiKey = 'AIzaSyBS-QIHhKKCmhg8Lz54cwxNeWW-DXHYOzM'; 
+    const apiKey = 'AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss'; 
     const range = 'houses!A:E';
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
@@ -131,7 +132,7 @@ async function fetchHouseDataFromGoogleSheets() {
 
 async function fetchFormResponseDataFromGoogleSheets() {
     const spreadsheetId = '1KKfRYIl4uh7N0HtxBT5EVGDKfZCXLJi81HNPNLkj-LY';
-    const apiKey = 'AIzaSyBS-QIHhKKCmhg8Lz54cwxNeWW-DXHYOzM'; 
+    const apiKey = 'AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss'; 
     const range = 'MaskedData!A:K';
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
