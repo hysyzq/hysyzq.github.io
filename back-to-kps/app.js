@@ -37,14 +37,22 @@ async function initMap() {
 
         houses.forEach(function(house) {
             if (!house.picked) {
-                const marker = new google.maps.marker.AdvancedMarkerElement({
-                    position: { lat: parseFloat(house.latitude), lng: parseFloat(house.longitude) },
-                    map: map,
-                    title: `${house.street_number} ${house.street_name}`,
-                    content: createMarkerContent(house)
+                const circle = new google.maps.Circle({
+                    strokeColor: '#dda15e',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 1, 
+                    fillColor: '#fefae0',
+                    fillOpacity: 0.6, 
+                    map: map, 
+                    center: {
+                        lat: parseFloat(house.latitude),
+                        lng: parseFloat(house.longitude)
+                    }, 
+                    radius: 7, 
                 });
-
-                marker.addListener('click', function() {
+        
+                // Add a click listener for the circle
+                google.maps.event.addListener(circle, 'click', function() {
                     openGoogleForm(house);
                 });
             }
@@ -96,9 +104,8 @@ function createMarkerContent(response) {
     return pinBackground.element;
 }
 
-
 async function fetchHouseDataFromGoogleSheets() {
-    const spreadsheetId = '1KKfRYIl4uh7N0HtxBT5EVGDKfZCXLJi81HNPNLkj-LY';
+    const spreadsheetId = '1EH5D_qMGHkv_OujOnUzluPRJ9QStMe1ZPaFQroZvCsc';
     const apiKey = 'AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss'; 
     const range = 'houses!A:E';
 
@@ -131,7 +138,7 @@ async function fetchHouseDataFromGoogleSheets() {
 }
 
 async function fetchFormResponseDataFromGoogleSheets() {
-    const spreadsheetId = '1KKfRYIl4uh7N0HtxBT5EVGDKfZCXLJi81HNPNLkj-LY';
+    const spreadsheetId = '1EH5D_qMGHkv_OujOnUzluPRJ9QStMe1ZPaFQroZvCsc';
     const apiKey = 'AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss'; 
     const range = 'MaskedData!A:K';
 
