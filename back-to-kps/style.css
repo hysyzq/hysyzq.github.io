@@ -78,3 +78,49 @@ main {
 #summaryPanel ul li {
     margin: 5px 0;
 }
+
+/* Header container for proper centering */
+.header-container {
+    display: flex;
+    flex-direction: column; /* Stack the header text and thank-you section vertically */
+    align-items: center;    /* Horizontally center content */
+    justify-content: center; /* Vertically center */
+    background: #ff0048;
+    color: white;
+    padding: 5px;
+    position: relative; /* For positioning the thank-you section */
+    text-align: center;
+    cursor: pointer; /* Add cursor pointer to indicate interactivity */
+}
+
+/* Header text centering */
+.header-text {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+/* Thank You Section: Initially Hidden */
+#thankYouSection {
+    visibility: hidden; /* Hide but keep space in DOM */
+    opacity: 0; /* Transparent */
+    position: absolute; /* Position relative to the header container */
+    top: 100%; /* Below the header */
+    left: 50%; /* Center align below header */
+    transform: translateX(-50%);
+    background: #e7f9f0;
+    padding: 15px;
+    border: 1px solid #52b788;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    z-index: 1000;
+    text-align: left;
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition */
+    color:#495057
+}
+
+/* Show Thank You Section on Hover */
+.header-container:hover #thankYouSection {
+    visibility: visible; /* Make visible */
+    opacity: 1; /* Fully opaque */
+}

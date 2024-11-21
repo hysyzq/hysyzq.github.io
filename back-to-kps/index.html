@@ -10,9 +10,14 @@
     <script src="app.js" defer></script>
 </head>
 <body onload="initMap()">
-    <header>
+    <header class="header-container">
         <h4 class="header-text">KPS - Community Form Collection</h4>
+        <div id="thankYouSection">
+            <p>Appreciate the map data contributions from:</p>
+            <p>Ajay, Bin, Bing, Cha, Felix</p>
+        </div>
     </header>
+    
     <main>
         <div id="map"></div>
         <div class="panel" id="formPanel">
@@ -22,7 +27,7 @@
                 <p>Total Houses: <span id="totalHouses">0</span></p>
                 <p>Responsed Houses <span id="responsedHouses">0</span></p>
                 <p>No Responses: <span id="noResponses">0</span></p>
-                <p>Support Levels:</p>
+                <h4>Support Levels:</h4>
                 <ul>
                     <li><span style="color: #52b788; font-weight: bold;">Green (Volunteers):</span> <span id="supportLevel4">0</span></li>
                     <li><span style="color: #00b4d8; font-weight: bold;">Blue (Limited Support): </span><span id="supportLevel3">0</span></li>
