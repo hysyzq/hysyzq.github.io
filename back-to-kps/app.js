@@ -1,3 +1,12 @@
+
+let summary = {
+    totalHouses: 0,
+    totalResponses: 0,
+    responsedHouses: 0,
+    noResponses: 0,
+    supportLevels: { 1: 0, 2: 0, 3: 0, 4: 0 }
+};
+
 async function initMap() {
     var communityCenter = { lat: -33.706276551341325,   lng: 150.94656745195007 }; // Your community coordinates
     var map = new google.maps.Map(document.getElementById("map"), {
@@ -10,6 +19,9 @@ async function initMap() {
     try {
         const houses = await fetchHouseDataFromGoogleSheets();
         const responses = await fetchFormResponseDataFromGoogleSheets();
+
+        summary.totalHouses = houses.length;
+        summary.totalResponses = responses.length;
 
         responses.forEach(function(response) {
             const matchingHouse = houses.find(house =>
@@ -31,6 +43,7 @@ async function initMap() {
                 marker.addListener('click', function() {
                     openPanelWithResponseData(response);
                 });
+                summary.supportLevels[response.support_level]++;
                 matchingHouse.picked += 1;
             }
         });
@@ -55,12 +68,28 @@ async function initMap() {
                 google.maps.event.addListener(circle, 'click', function() {
                     openGoogleForm(house);
                 });
+                summary.noResponses ++;
             }
         });
+        summary.responsedHouses = summary.totalHouses - summary.noResponses;
+        updateSummaryUI(summary);
 
     } catch (error) {
         console.error("Error fetching house data:", error);
     }
+}
+
+function updateSummaryUI(summary) {
+    document.getElementById('totalHouses').textContent = summary.totalHouses;
+    document.getElementById('totalResponses').textContent = summary.totalResponses;
+    document.getElementById('responsedHouses').textContent = summary.responsedHouses;
+    document.getElementById('noResponses').textContent = summary.noResponses;
+
+    // Update support level counts
+    document.getElementById('supportLevel1').textContent = summary.supportLevels[1];
+    document.getElementById('supportLevel2').textContent = summary.supportLevels[2];
+    document.getElementById('supportLevel3').textContent = summary.supportLevels[3];
+    document.getElementById('supportLevel4').textContent = summary.supportLevels[4];
 }
 
 function createMarkerContent(response) {
@@ -84,7 +113,6 @@ function createMarkerContent(response) {
             scale = 1.0;
             break;
         case 1:
-        case 5:
             pinColor = '#495057'; // Grey
             borderColor = '#343a40';
             scale = 0.7;
@@ -188,9 +216,8 @@ function getSupportLevel(support_community){
             return 2
         case 'No, not at this time.':
         case "No, I don't want to return back to KPS.":
-            return 1;
         case "No, I don't care at all.":
-            return 5;
+            return 1;
         default:
             return 0;
     }
@@ -213,7 +240,6 @@ function openPanelWithResponseData(response) {
     `;
 }
 
-
 function openGoogleForm() {
     // Display Google Form link in the panel
     const formPanel = document.getElementById('formPanel');
@@ -227,7 +253,22 @@ function openGoogleForm() {
 
 function closePanel() {
     const formPanel = document.getElementById('formPanel');
-    formPanel.innerHTML = `<h3>House Information</h3>
+    formPanel.innerHTML = `
+             <div id="summaryPanel">
+                <h3>Summary</h3>
+                <p>Total Responses: <span id="totalResponses">0</span></p>
+                <p>Total Houses: <span id="totalHouses">0</span></p>
+                <p>Responsed Houses <span id="responsedHouses">0</span></p>
+                <p>No Responses: <span id="noResponses">0</span></p>
+                <p>Support Levels:</p>
+                <ul>
+                    <li><span style="color: #52b788; font-weight: bold;">Green (Volunteers):</span> <span id="supportLevel4">0</span></li>
+                    <li><span style="color: #00b4d8; font-weight: bold;">Blue (Limited Support): </span><span id="supportLevel3">0</span></li>
+                    <li><span style="color: #e63946; font-weight: bold;">Red (Not Sure): </span> <span id="supportLevel2">0</span></li>
+                    <li><span style="color: #495057; font-weight: bold;">Gray (Don’t Support):</span><span id="supportLevel1">0</span></li>
+                </ul>
+            </div>
+            <h3>House Information</h3>
             <p>Welcome to the community form collection app! Here's what the markers on the map represent:</p>
             <ul>
                 <li><span style="color: #52b788; font-weight: bold;">Green:</span> Actively supports the community through volunteering.</li>
@@ -237,4 +278,5 @@ function closePanel() {
                 <li><span style="color: #ead875; font-weight: bold;">Yellow:</span> No response recorded yet. Please click and fill the form.</li>
             </ul>
             <p>Click on a marker to see more details or submit your information via the Google Form.</p>`;
+    updateSummaryUI(summary);
 }
