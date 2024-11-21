@@ -84,6 +84,7 @@ function createMarkerContent(response) {
             scale = 1.0;
             break;
         case 1:
+        case 5:
             pinColor = '#495057'; // Grey
             borderColor = '#343a40';
             scale = 0.7;
@@ -188,6 +189,8 @@ function getSupportLevel(support_community){
         case 'No, not at this time.':
         case "No, I don't want to return back to KPS.":
             return 1;
+        case "No, I don't care at all.":
+            return 5;
         default:
             return 0;
     }
