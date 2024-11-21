@@ -200,7 +200,7 @@ function openPanelWithResponseData(response) {
         <h3>Address: ${response.street_number} ${response.street_name}</h3>
         <p><strong>Preferred Name:</strong> ${response.preferred_name}</p>
         <p><strong>Email:</strong> ${response.email}</p>
-        <p><strong>Support Community:</strong> ${response.support_community}</p>
+        <p><strong>Support this campaign:</strong> ${response.support_community}</p>
         <p><strong>Main Concerns:</strong> ${response.main_concerns}</p>
         <p><strong>Petition signed:</strong> ${response.petition}</p>
         <p><strong>Phone number:</strong> ${response.phone_number ? response.phone_number : 'N/A'}</p>
@@ -228,9 +228,9 @@ function closePanel() {
             <p>Welcome to the community form collection app! Here's what the markers on the map represent:</p>
             <ul>
                 <li><span style="color: #52b788; font-weight: bold;">Green:</span> Actively supports the community through volunteering.</li>
-                <li><span style="color: #00b4d8; font-weight: bold;">Blue:</span> Interested in participating in important meetings only.</li>
-                <li><span style="color: #495057; font-weight: bold;">Gray:</span> Not currently interested in participating.</li>
-                <li><span style="color: #e63946; font-weight: bold;">Red:</span> Interested but needs more information.</li>
+                <li><span style="color: #00b4d8; font-weight: bold;">Blue:</span> Limited support.</li>
+                <li><span style="color: #495057; font-weight: bold;">Gray:</span> Don't want to return KPS.</li>
+                <li><span style="color: #e63946; font-weight: bold;">Red:</span> Not sure yet.</li>
                 <li><span style="color: #ead875; font-weight: bold;">Yellow:</span> No response recorded yet. Please click and fill the form.</li>
             </ul>
             <p>Click on a marker to see more details or submit your information via the Google Form.</p>`;
