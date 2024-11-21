@@ -185,6 +185,7 @@ function getSupportLevel(support_community){
         case 'I am interested, but I need more information.':
             return 2
         case 'No, not at this time.':
+        case "No, I don't want to return back to KPS.":
             return 1;
         default:
             return 0;
