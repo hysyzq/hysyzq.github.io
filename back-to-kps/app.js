@@ -183,6 +183,7 @@ function getSupportLevel(support_community){
         case 'Yes, but I only want to participate in the most important meetings.':
             return 3;
         case 'I am interested, but I need more information.':
+        case "Not sure if we should return back to KPS.":
             return 2
         case 'No, not at this time.':
         case "No, I don't want to return back to KPS.":
