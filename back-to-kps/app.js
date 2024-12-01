@@ -19,6 +19,7 @@ async function initMap() {
     try {
         const houses = await fetchHouseDataFromGoogleSheets();
         const responses = await fetchFormResponseDataFromGoogleSheets();
+        const volunteerData = await fetchVolunteerFrom();
 
         summary.totalHouses = houses.length;
         summary.totalResponses = responses.length;
@@ -50,23 +51,71 @@ async function initMap() {
 
         houses.forEach(function(house) {
             if (!house.picked) {
+
+                const volunteerMatches = volunteerData.filter(volunteer =>
+                    volunteer.street_number === house.street_number &&
+                    volunteer.street_name === house.street_name
+                );
+        
+                // Get the latest volunteer data based on the timestamp
+                const latestVolunteer = volunteerMatches.sort((a, b) =>
+                    new Date(b.timestamp) - new Date(a.timestamp)
+                )[0];
+
+                let strokeColor = '#dda15e'; // Default stroke color for unmatched houses
+                let fillColor = '#fefae0';   // Default fill color for unmatched houses
+                let radius = 7;
+        
+                if (latestVolunteer) {
+                    // Update circle color based on support level from volunteer data
+                    switch (parseInt(latestVolunteer.support_level)) {
+                        case 5:// Volunteer
+                            strokeColor = '#52b788'; // Green stroke
+                            fillColor = '#d8f3dc';   // Light green fill
+                            radius = 8;
+                            break;
+                        case 4: 
+                        case 3: // Supporter
+                            strokeColor = '#00b4d8'; // Blue stroke
+                            fillColor = '#caf0f8';   // Light blue fill
+                            radius = 8;
+                            break;
+                        case 2: // Interested but undecided
+                            strokeColor = '#e63946'; // Red stroke
+                            fillColor = '#ffccd5';   // Light red fill
+                            break;
+                        case 1: // Don't support
+                            strokeColor = '#495057'; // Grey stroke
+                            fillColor = '#ced4da';   // Light grey fill
+                            radius = 5;
+                            break;
+                        default:
+                            // Keep the default colors
+                            break;
+                    }
+                }
+
                 const circle = new google.maps.Circle({
-                    strokeColor: '#dda15e',
+                    strokeColor: strokeColor,
                     strokeOpacity: 0.8,
                     strokeWeight: 1, 
-                    fillColor: '#fefae0',
+                    fillColor: fillColor,
                     fillOpacity: 0.6, 
                     map: map, 
                     center: {
                         lat: parseFloat(house.latitude),
                         lng: parseFloat(house.longitude)
                     }, 
-                    radius: 7, 
+                    radius: radius, 
                 });
         
                 // Add a click listener for the circle
                 google.maps.event.addListener(circle, 'click', function() {
-                    openGoogleForm(house);
+                    if (latestVolunteer) {
+                        openPanelWithVolunteerData(latestVolunteer); // Show the latest volunteer data
+                    } else {
+                        openGoogleForm(house); // Open form for unmatched houses
+                    }
                 });
                 summary.noResponses ++;
             }
@@ -205,6 +254,40 @@ async function fetchFormResponseDataFromGoogleSheets() {
     return responses;
 }
 
+async function fetchVolunteerFrom() {
+    const spreadsheetId = '1EH5D_qMGHkv_OujOnUzluPRJ9QStMe1ZPaFQroZvCsc';
+    const apiKey = 'AIzaSyDB_wY6Ucs22RYTlnnHCvg8CFMj2M6WUss'; 
+    const range = 'VolunteerForm!A:F';
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch Google Sheets data');
+    }
+    const data = await response.json();
+    
+    // Transform the data from the Google Sheet to the required format
+    const rows = data.values;
+    const volunteerData = [];
+    
+    // Assuming the first row is headers, start from the second row
+    for (let i = 1; i < rows.length; i++) {
+        const [timestamp, street_number, street_name, support_level, comments, volunteer] = rows[i];
+        volunteerData.push({
+            timestamp: timestamp,
+            street_number: street_number,
+            street_name: street_name,
+            support_level: support_level,
+            comments: comments,
+            volunteer: volunteer,
+        });
+        console.log(rows[i]);
+    }
+
+    return volunteerData;
+}
+
 function getSupportLevel(support_community){
     switch (support_community) {
         case 'Yes, through volunteering.':
@@ -246,7 +329,25 @@ function openGoogleForm() {
     formPanel.innerHTML = `
         <h3>Submit Your Information</h3>
         <p>Please fill out the form to provide more information about your household.</p>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd9RBuwM5OJFsknA77ag35fo8iFY1HEXMjw78E-9vQeHb4A1g/viewform?usp=sf_link" target="_blank">Open Google Form</a>
+        <a href="https://forms.gle/6ocvUTV2GzJdDJJD6" target="_blank">Open Google Form</a>.
+        <p>If you are a volunteer, use <a href="https://forms.gle/K4UAbJmMBJaTP8iQ8" target="_blank">Volunteer Form</a>.</p>
+        <button onclick="closePanel()">Close</button>
+    `;
+}
+
+function openPanelWithVolunteerData(volunteer) {
+    const formPanel = document.getElementById('formPanel');
+    formPanel.innerHTML = `
+        <h3>Volunteer Information</h3>
+        <p><strong>Address:</strong> ${volunteer.street_number} ${volunteer.street_name}</p>
+        <p><strong>Support Level:</strong> ${volunteer.support_level}</p>
+        <p><strong>Comments:</strong> ${volunteer.comments ? volunteer.comments : 'N/A'}</p>
+        <p><strong>Volunteer's Name:</strong> ${volunteer.volunteer ? volunteer.volunteer : 'N/A'}</p>
+        <p><strong>Last Updated:</strong> ${new Date(volunteer.timestamp).toLocaleString()}</p>
+        <h3>Submit Your Information</h3>
+        <p>Please fill out the form to provide more information about your household.</p>
+        <a href="https://forms.gle/6ocvUTV2GzJdDJJD6" target="_blank">Open Google Form</a>.
+        <p>If you are a volunteer, use <a href="https://forms.gle/K4UAbJmMBJaTP8iQ8" target="_blank">Volunteer Form</a>.</p>
         <button onclick="closePanel()">Close</button>
     `;
 }
@@ -263,20 +364,11 @@ function closePanel() {
                 <p>Support Levels:</p>
                 <ul>
                     <li><span style="color: #52b788; font-weight: bold;">Green (Volunteers):</span> <span id="supportLevel4">0</span></li>
-                    <li><span style="color: #00b4d8; font-weight: bold;">Blue (Limited Support): </span><span id="supportLevel3">0</span></li>
-                    <li><span style="color: #e63946; font-weight: bold;">Red (Not Sure): </span> <span id="supportLevel2">0</span></li>
+                    <li><span style="color: #00b4d8; font-weight: bold;">Blue (Supportor): </span><span id="supportLevel3">0</span></li>
+                    <li><span style="color: #e63946; font-weight: bold;">Red (Aware): </span> <span id="supportLevel2">0</span></li>
                     <li><span style="color: #495057; font-weight: bold;">Gray (Don’t Support):</span><span id="supportLevel1">0</span></li>
                 </ul>
             </div>
-            <h3>House Information</h3>
-            <p>Welcome to the community form collection app! Here's what the markers on the map represent:</p>
-            <ul>
-                <li><span style="color: #52b788; font-weight: bold;">Green:</span> Actively supports the community through volunteering.</li>
-                <li><span style="color: #00b4d8; font-weight: bold;">Blue:</span> Limited support.</li>
-                <li><span style="color: #495057; font-weight: bold;">Gray:</span> Don't want to return KPS.</li>
-                <li><span style="color: #e63946; font-weight: bold;">Red:</span> Not sure yet.</li>
-                <li><span style="color: #ead875; font-weight: bold;">Yellow:</span> No response recorded yet. Please click and fill the form.</li>
-            </ul>
-            <p>Click on a marker to see more details or submit your information via the Google Form.</p>`;
+            <p>Click on a marker to see more details or submit your information via the <a href="https://forms.gle/6ocvUTV2GzJdDJJD6" target="_blank">Google Form</a>.</p>`;
     updateSummaryUI(summary);
 }
